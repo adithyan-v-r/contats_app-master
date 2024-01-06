@@ -11,21 +11,25 @@ class ChatRoom extends StatefulWidget {
 
 class _ChatRoomState extends State<ChatRoom> {
   String? messages;
+  Timestamp? time;
   TextEditingController messageController = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    final width =MediaQuery.of(context).size.width;
+    final width = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SafeArea(
         child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('messages').snapshots(),
+          stream: FirebaseFirestore.instance
+              .collection('messages')
+              .orderBy('TimeStamp')
+              .snapshots(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
-              return CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             } else {
               List<DocumentSnapshot> documents = snapshot.data!.docs;
+
               return ListView.builder(
-                reverse: true,
                 itemCount: documents.length,
                 itemBuilder: (context, index) {
                   return Align(
@@ -33,17 +37,35 @@ class _ChatRoomState extends State<ChatRoom> {
                         ? Alignment.bottomRight
                         : Alignment.bottomLeft,
                     child: Container(
-                      constraints: BoxConstraints(maxWidth: width*0.7),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: documents[index]['Name'] == widget.name
-                              ? Colors.green
-                              : Colors.blue),
-                      padding: EdgeInsets.all(15),
-                      margin: EdgeInsets.all(15),
-                      child: Text(
-                        documents[index]['Message'],
-                        style: TextStyle(color: Colors.white),
+                      constraints: BoxConstraints(maxWidth: width * 0.7),
+                      decoration: documents[index]['Name'] == widget.name
+                          ? const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
+                                  topLeft: Radius.circular(20)),
+                              color: Colors.green)
+                          : const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomRight: Radius.circular(20),
+                                  bottomLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20)),
+                              color: Colors.blue),
+                      padding: const EdgeInsets.all(15),
+                      margin: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(documents[index]['Name'],
+                              style: const TextStyle(
+                                  color: Colors.lime,
+                                  fontWeight: FontWeight.bold)),
+                          Text(
+                            documents[index]['Message'],
+                            style: const TextStyle(color: Colors.white),
+
+                          )
+                        ],
                       ),
                     ),
                   );
