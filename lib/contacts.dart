@@ -22,19 +22,19 @@ class _HomePageState extends State<HomePage> {
           height: 500,
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 50,
               ),
               Image.network(
                   width: 100,
                   'https://mailmeteor.com/logos/assets/PNG/Google_Chat_Logo_512px.png'),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              Text(
+              const Text(
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
                   'Chat Room'),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               Padding(
@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold,
                         fontSize: 20),
                   ),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green.shade800),
                 ),
               )
             ],

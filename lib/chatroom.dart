@@ -11,6 +11,7 @@ class ChatRoom extends StatefulWidget {
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+  final scrollControler =ScrollController();
   String? messages;
   Timestamp? time;
   TextEditingController messageController = TextEditingController();
@@ -19,11 +20,12 @@ class _ChatRoomState extends State<ChatRoom> {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(backgroundColor:Colors.green.shade50,
-          title: Text(
-              style: TextStyle(
-                  color: Colors.green.shade900, fontWeight: FontWeight.bold),
-              widget.name.toString().toUpperCase())),
+      backgroundColor: Colors.grey.shade300,
+      // appBar: AppBar(backgroundColor:Colors.green.shade50,
+      //     title: Text(
+      //         style: TextStyle(
+      //             color: Colors.green.shade900, fontWeight: FontWeight.bold),
+      //         widget.name.toString().toUpperCase())),
       body: SafeArea(
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
@@ -35,96 +37,111 @@ class _ChatRoomState extends State<ChatRoom> {
               return const Center(child: CircularProgressIndicator());
             } else {
               List<DocumentSnapshot> documents = snapshot.data!.docs;
+              documents=documents.reversed.toList();
 
-              return ListView.builder(
-                itemCount: documents.length,
-                itemBuilder: (context, index) {
-                  return Align(
-                      alignment: documents[index]['Name'] == widget.name
-                          ? Alignment.bottomRight
-                          : Alignment.bottomLeft,
-                      child: Container(
-                          constraints: BoxConstraints(maxWidth: width * 0.7),
-                          decoration: documents[index]['Name'] == widget.name
-                              ? const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20),
-                                      topLeft: Radius.circular(20)),
-                                  color: Colors.green)
-                              : const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      bottomRight: Radius.circular(20),
-                                      bottomLeft: Radius.circular(20),
-                                      topRight: Radius.circular(20)),
-                                  color: Colors.blue),
-                          padding: documents[index]['Name'] == widget.name
-                              ? const EdgeInsets.all(15)
-                              : const EdgeInsets.only(
-                                  left: 15, right: 15, bottom: 10, top: 10),
-                          margin: const EdgeInsets.all(10),
-                          child: documents[index]['Name'] == widget.name
-                              ? Text(documents[index]['Message'],
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 16))
-                              : Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(documents[index]['Name'],
-                                        style: const TextStyle(
-                                            color: Colors.lime,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold)),
-                                    Text(
-                                      documents[index]['Message'],
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    )
-                                  ],
-                                )));
-                },
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: documents.length,
+                        reverse: true,
+                        controller: scrollController,
+                        itemBuilder: (context, index) {
+                          return Align(
+                              alignment: documents[index]['Name'] == widget.name
+                                  ? Alignment.bottomRight
+                                  : Alignment.bottomLeft,
+                              child: Container(
+                                  constraints: BoxConstraints(maxWidth: width * 0.7),
+                                  decoration: documents[index]['Name'] == widget.name
+                                      ? const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(20),
+                                              topRight: Radius.circular(20),
+                                              topLeft: Radius.circular(20)),
+                                          color: Colors.green)
+                                      : const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              bottomRight: Radius.circular(20),
+                                              bottomLeft: Radius.circular(20),
+                                              topRight: Radius.circular(20)),
+                                          color: Colors.white70),
+                                  padding: documents[index]['Name'] == widget.name
+                                      ? const EdgeInsets.all(15)
+                                      : const EdgeInsets.only(
+                                          left: 15, right: 15, bottom: 10, top: 10),
+                                  margin: const EdgeInsets.all(10),
+                                  child: documents[index]['Name'] == widget.name
+                                      ? Text(documents[index]['Message'],
+                                          style: const TextStyle(
+                                              color: Colors.white, fontSize: 16))
+                                      : Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(documents[index]['Name'],
+                                                style: const TextStyle(
+                                                    color: Colors.green,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold)),
+                                            Text(
+                                              documents[index]['Message'],
+                                              style: const TextStyle(
+                                                  color: Colors.black, fontSize: 16),
+                                            )
+                                          ],
+                                        )));
+                        },
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: SizedBox(
+                              height: 55,
+                              child: TextField(
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(Icons.emoji_emotions,color: Colors.green.shade900),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(30),
+                                          borderSide: BorderSide.none),
+                                      hintText: 'Type something...'),
+                                  controller: messageController),
+                            )),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            messageController.text == ''
+                                ? Vibration.vibrate(duration: 100)
+                                : addData();
+                            scrollController.animateTo(0,duration:const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                            messageController.text = '';
+                          },
+                          child: Container(
+                            width: 45,
+                            height: 45,
+                            decoration: BoxDecoration(
+                                color: Colors.green.shade800,
+                                borderRadius: BorderRadius.circular(30)),
+                            child: Icon(Icons.send, size: 30, color: Colors.white),
+                          ),
+                        )
+                      ],
+                    ),
+
+                  ],
+                ),
               );
             }
           },
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.green.shade50,
-        height: 70,
-        child: Row(
-          children: [
-            Expanded(
-                child: TextField(
-                    decoration: InputDecoration(
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(20),
-                            borderSide: BorderSide.none),
-                        hintText: 'Type something...'),
-                    controller: messageController)),
-            SizedBox(
-              width: 10,
-            ),
-            InkWell(
-              onTap: () {
-                messageController.text == ''
-                    ? Vibration.vibrate(duration: 100)
-                    : addData();
-                messageController.text = '';
-              },
-              child: Container(
-                width: 45,
-                height: 45,
-                decoration: BoxDecoration(
-                    color: Colors.green.shade800,
-                    borderRadius: BorderRadius.circular(30)),
-                child: Icon(Icons.send, size: 30, color: Colors.white),
-              ),
-            )
-          ],
-        ),
-      ),
+
     );
   }
 
