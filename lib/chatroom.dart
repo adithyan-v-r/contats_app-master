@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:vibration/vibration.dart';
 
@@ -61,7 +62,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                               bottomLeft: Radius.circular(20),
                                               topRight: Radius.circular(20),
                                               topLeft: Radius.circular(20)),
-                                          color: Colors.green)
+                                          color: Colors.blue)
                                       : const BoxDecoration(
                                           borderRadius: BorderRadius.only(
                                               bottomRight: Radius.circular(20),
@@ -82,7 +83,7 @@ class _ChatRoomState extends State<ChatRoom> {
                                           children: [
                                             Text(documents[index]['Name'],
                                                 style: const TextStyle(
-                                                    color: Colors.green,
+                                                    color: Colors.blue,
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold)),
                                             Text(
@@ -97,18 +98,20 @@ class _ChatRoomState extends State<ChatRoom> {
                     ),
                     Row(
                       children: [
-                        Expanded(
+                        CircleAvatar(radius: 25,child: Icon(CupertinoIcons.plus,color: Colors.white,),backgroundColor: Colors.blue),
+            SizedBox(
+            width: 10,),
+            Expanded(
                             child: SizedBox(
                               height: 55,
                               child: TextField(
                                   decoration: InputDecoration(
-                                    prefixIcon: Icon(Icons.emoji_emotions,color: Colors.green.shade900),
                                       filled: true,
                                       fillColor: Colors.white,
                                       border: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(30),
                                           borderSide: BorderSide.none),
-                                      hintText: 'Type something...'),
+                                      hintText: 'type something....',hintStyle: TextStyle(color: Colors.blue)),
                                   controller: messageController),
                             )),
                         SizedBox(
@@ -122,13 +125,8 @@ class _ChatRoomState extends State<ChatRoom> {
                             scrollController.animateTo(0,duration:const Duration(milliseconds: 300), curve: Curves.easeInOut);
                             messageController.text = '';
                           },
-                          child: Container(
-                            width: 45,
-                            height: 45,
-                            decoration: BoxDecoration(
-                                color: Colors.green.shade800,
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Icon(Icons.send, size: 30, color: Colors.white),
+                          child: CircleAvatar(backgroundColor: Colors.blue,radius: 25,
+                            child: Icon(Icons.send,color: Colors.white,size: 25),
                           ),
                         )
                       ],
